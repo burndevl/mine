@@ -1,32 +1,36 @@
+# library
 import cv2
 import time
+import pygame
 
-# vidio overlay
-video_path = "bemines.mp4"
+# run music
+pygame.mixer.init()
+pygame.mixer.music.load("mine.mp3")
+pygame.mixer.music.play()
 
-# Lirik menyesuaikan saran pake gemini buat cek detik liriknya
+# Video yang mau diputar
+video_path = "beminee.mp4"
+
+# ator lirik dsni
 lyrics = [
-    ("1", 1),
-    ("2", 1),
     ("3", 1),
-    ("we fall in love in October", 2),
-    ("we fell in love in October", 2),
-    ("that's why, i love fall", 2),
-    ("Looking at the stars", 1),
-    ("admiring from afar", 2),
-    ("my girl, my girl, my girl", 1),
-    ("you will be my girl", 2),
-    ("my girl, my girl, my girl", 3),
+    ("we fell in love in October", 4),
+    ("that's why, i love fall", 4),
+    ("Looking at the stars", 4),
+    ("admiring from afar", 3),
+    ("my girl, my girl, my girl", 5),
+    ("you will be my girl", 4),
+    ("my girl, my girl, my girl", 5),
     ("Info Template cwe :/", 5)
 ]
 
 # Buka video
 cap = cv2.VideoCapture(video_path)
 
-# frame rate inisiasi
+# Ambil frame rate
 fps = cap.get(cv2.CAP_PROP_FPS)
 if fps == 0:
-    fps = 25 
+    fps = 25  # fallback
 
 # waktu
 start_time = time.time()
@@ -38,24 +42,25 @@ while cap.isOpened():
     if not ret:
         break
 
-    # inisiasi posisi frame
+    # cek posisi frame
     height, width, _ = frame.shape
     font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 1.2      # font
-    thickness = 3         # jadi bold
+    font_scale = 1.2      # ukuran font lebih besar
+    thickness = 3         # lebih tebal = bold
     (text_width, text_height), _ = cv2.getTextSize(current_text, font, font_scale, thickness)
     x = (width - text_width) // 2
     y = (height + text_height) // 2
 
-    # Overlay teks atur warna dll dsini
+    # Overlay teks dengan warna hitam
     warna_hitam = (0, 0, 0)
     cv2.putText(frame, current_text, (x, y), font, font_scale, warna_hitam, thickness, cv2.LINE_AA)
 
-    # buka tab vidio
-    cv2.imshow("mines template pinterst", frame)
+    # Tampilkan video
+    cv2.imshow("Iko Trend Anomali", frame)
 
-    # if cv2.waitKey(int(1000/fps)) & 0xFF == ord('q'):
-    #     break
+    # Tekan 'q' untuk keluar
+    if cv2.waitKey(int(1000/fps)) & 0xFF == ord('q'):
+        break
 
     # Update lirik sesuai durasi
     elapsed = time.time() - start_time
@@ -65,7 +70,10 @@ while cap.isOpened():
         if lyric_index < len(lyrics):
             current_text, duration_text = lyrics[lyric_index]
         else:
-            current_text = ""  # teks hilang kalo lyrik habis
+            current_text = ""  # teks hilang setelah habis
 
 cap.release()
 cv2.destroyAllWindows()
+
+# Stop musik setelah selesai
+pygame.mixer.music.stop()
